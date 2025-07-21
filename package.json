@@ -17,14 +17,16 @@
     "url": "https://github.com/mdcamp-week3/server/issues"
   },
   "homepage": "https://github.com/mdcamp-week3/server#readme",
-  "description": "",
   "dependencies": {
-    "express": "^5.1.0"
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.16.4"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/node": "^24.0.15",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.8.3"
-  }
+    "ts-node-dev": "^2.0.0"
+  },
+  "description": "",
+  "type": "module"
 }
