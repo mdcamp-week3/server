@@ -14,6 +14,8 @@ app.get("/api/hello", (req, res) => {
   res.json({ message: "Hello from server!" });
 });
 
+app.use('/api/category-details', categoryDetailRouter)
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
