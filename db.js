@@ -12,7 +12,7 @@ export const connectDB = async () => {
 
   try {
     await mongoose.connect(uri, {
-      dbName: "talktic",
+      dbName: "Talktic",
     });
     console.log("MongoDB 연결 성공");
   } catch (err) {
