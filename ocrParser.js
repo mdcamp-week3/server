@@ -9,8 +9,7 @@ export function parseKakaoOCRWithAlternatingPattern(ocrJson, imageWidth) {
   // 2. 이름 추출
   const possibleName = sortedFields.find(
     f =>
-      f.inferText.length >= 2 &&
-      f.inferText.length <= 4 &&
+      f.inferText.length == 3 &&
       /^[가-힣]+$/.test(f.inferText)
   );
   const otherName = possibleName ? possibleName.inferText : '상대방';

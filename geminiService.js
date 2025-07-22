@@ -1,8 +1,56 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import ParticipantAnalysis from './models/ParticipantAnalysis.js';
+import AnalysisResult from './models/AnalysisResult.js';
 
 dotenv.config();
+
+function calculatePersonScore({
+  emotionPositiveRatio,
+  emotionNegativeRatio,
+  neutralRatio,
+  questionRate,
+  directLikeExpressionCount,
+  avgResponseDelay,
+  totalMessages,
+}) {
+  // 1. 직접적 호감 표현 수 (3회 이상이면 1.0로 정규화)
+  const normalizedLike = Math.min(directLikeExpressionCount / 3, 1);
+
+  // 2. 응답 속도 (30분 이상이면 0, 0에 가까울수록 1)
+  const normalizedDelay = 1 - Math.min(avgResponseDelay * 60 / 1800, 1); // 분 → 초 변환 후 정규화
+
+  // 3. 질문 비율은 그대로 사용 (0~1)
+  const normalizedQuestion = questionRate;
+
+  // 4. 감정 (긍정 비율이 높을수록 +점수, 부정 비율이 높을수록 -보정)
+  const adjustedEmotion = Math.max(emotionPositiveRatio - 0.5 * emotionNegativeRatio, 0); // 보정된 긍정 감정
+
+  // 5. 중립 대화 비율이 너무 높으면 감점 (70% 이상일 경우 가중치 하향)
+  const neutralPenalty = neutralRatio > 0.7 ? -0.1 * (neutralRatio - 0.7) : 0;
+
+  // 6. 메시지 총 수가 너무 적으면 신뢰도 하락 (5개 이하면 -보정)
+  const messagePenalty = totalMessages < 5 ? -0.1 * (5 - totalMessages) : 0;
+
+  let score =
+    0.8 * adjustedEmotion +
+    0.2 * normalizedLike +
+    0.2 * normalizedQuestion +
+    0.1 * normalizedDelay +
+    neutralPenalty +
+    messagePenalty;
+
+  score = Math.max(0, Math.min(score, 1));
+  return parseFloat(score.toFixed(3));
+}
+
+function calculateFinalScore(meScore, youScore) {
+  const balanceFactor = 1 - Math.abs(meScore - youScore);
+  const total = 0.4 * meScore + 0.4 * youScore + 0.2 * balanceFactor;
+  return parseFloat(total.toFixed(3));
+}
+
+
 
 const GEMINI_API_URL =
   'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
@@ -70,7 +118,7 @@ export async function analyzeConversation(conversationText, otherName) {
     if (!merged['나']) throw new Error('"나" 분석 결과 없음');
 
     return merged;
-    
+
   } catch (error) {
     console.error('Gemini 분석 실패:', error?.response?.data || error.message);
     throw error;
@@ -84,7 +132,13 @@ export async function analyzeAndSave(conversationId, parsedDialogues) {
     .join('\n');
 
   const otherName = parsedDialogues.find(d => d.speaker === '너')?.name || '상대방'
+
   const result = await analyzeConversation(conversationText, otherName);
+  console.log('Gemini 응답 result:', result);
+
+  
+  let meScore = null;
+  let youScore = null;
 
   for (const speaker of ['나', otherName]) {
     const data = result[speaker];
@@ -98,9 +152,18 @@ export async function analyzeAndSave(conversationId, parsedDialogues) {
       continue;
     }
 
+    const isMe = speaker === '나';
+    const score = calculatePersonScore(data);
+
+    if (isMe) {
+      meScore = score;
+    } else {
+      youScore = score;
+    }
+
     const analysis = new ParticipantAnalysis({
       conversationId,
-      speaker: speaker === otherName ? '너' : '나',
+      speaker: isMe ? '너' : '나',
       otherName,
       emotionPositiveRatio: Number(data.emotionPositiveRatio || 0),
       emotionNegativeRatio: Number(data.emotionNegativeRatio || 0),
@@ -114,4 +177,26 @@ export async function analyzeAndSave(conversationId, parsedDialogues) {
     await analysis.save();
   }
 
+  let finalScore = null;
+
+  if (meScore !== null && youScore !== null) {
+    finalScore = calculateFinalScore(meScore, youScore);
+
+    const final = new AnalysisResult({
+      conversationId,
+      meScore,
+      youScore,
+      finalLikeScore: finalScore,
+    });
+
+    await final.save();
+  }
+
+  return {
+  conversationId,
+  meScore,
+  youScore,
+  finalLikeScore: finalScore,
+  otherName
+};
 }

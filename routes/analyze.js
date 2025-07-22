@@ -11,8 +11,8 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    await analyzeAndSave(conversationId, parsedDialogues);
-    res.json({ success: true });
+    const result = await analyzeAndSave(conversationId, parsedDialogues);
+    res.json(result);
   } catch (err) {
     console.error('analyzeAndSave 실패:', err);
     res.status(500).json({ error: 'Gemini 분석 및 저장 실패' });
