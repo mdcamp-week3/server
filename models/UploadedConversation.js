@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 
 
 const UploadedConversationSchema = new mongoose.Schema({
-  fileName: { type: String, required: true },
+  ocrResult: Object,
+  parsedDialogues: Array,
   createdAt: { type: Date, default: Date.now }
 });
 

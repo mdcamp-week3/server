@@ -5,6 +5,7 @@ import categoryDetailRouter from "./routes/categoryDetails.js";
 import analyzeRouter from "./routes/analyze.js";
 import cors from 'cors';
 import imageRoutes from './routes/imageRoutes.js';
+import conversationRouter from './routes/conversation.js';
 
 connectDB();
 
@@ -25,8 +26,8 @@ app.get("/api/hello", (req, res) => {
 
 const port = process.env.PORT || 3000;
 
-app.use('/api/category-details', categoryDetailRouter)
 app.use('/api/analyze', analyzeRouter);
+app.use('/api/conversation', conversationRouter);
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
