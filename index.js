@@ -6,6 +6,7 @@ import analyzeRouter from "./routes/analyze.js";
 import cors from 'cors';
 import imageRoutes from './routes/imageRoutes.js';
 import conversationRouter from './routes/conversation.js';
+import geminiNextReplyRoutes from './routes/geminiNextReply.js';
 
 connectDB();
 
@@ -28,6 +29,7 @@ const port = process.env.PORT || 3000;
 
 app.use('/api/analyze', analyzeRouter);
 app.use('/api/conversation', conversationRouter);
+app.use('/api/gemini', geminiNextReplyRoutes);
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
