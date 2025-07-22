@@ -9,11 +9,12 @@ const ParticipantAnalysisSchema = new mongoose.Schema({
   emotionNegativeRatio: { type: Number, required: true },
   neutralRatio: { type: Number, required: true },
 
-  emojiUsageRate: { type: Number, required: true },
   questionRate: { type: Number, required: true },
   directLikeExpressionCount: { type: Number, required: true },
   avgResponseDelay: { type: Number, required: true },
-  totalMessages: { type: Number, required: true }
+  totalMessages: { type: Number, required: true },
+
+  otherName: { type: String, required: true }
 });
 
 
