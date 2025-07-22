@@ -6,6 +6,8 @@ import analyzeRouter from "./routes/analyze.js";
 import cors from 'cors';
 import imageRoutes from './routes/imageRoutes.js';
 
+connectDB();
+
 dotenv.config();
 const app = express();
 
@@ -13,13 +15,13 @@ connectDB();
 
 app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
-app.use('/api/image', imageRoutes); // ✅ '/api/image/upload' 경로가 되게 설정
+app.use('/api/image', imageRoutes); // '/api/image/upload' 경로가 되게 설정
 
+app.use('/api/categoryDetails', categoryDetailRouter)
 
 app.get("/api/hello", (req, res) => {
   res.json({ message: "Hello from server!" });
 });
-
 
 const port = process.env.PORT || 3000;
 
