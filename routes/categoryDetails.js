@@ -13,13 +13,16 @@ router.get('/:categoryName', async (req, res) => {
 
         const count = 3;
 
+        console.log('category._id:', category._id, typeof category._id);
         const details = await ICategoryDetail.aggregate([
-            { $match: {categoryId: category._id}},
-            { $sample : {size: count}}
-        ]);   
-        res.json(details.modifiedPaths(d => d.content));
+            { $match: { categoryId: category._id } },
+            { $sample: { size: count } }
+        ]);
+        console.log('details:', details);
+        res.json(details); 
     }catch(err){
-        res.status(500).json({ error: '서버 오류' });
+        console.error('서버 오류:', err); // 에러 전체 출력
+        res.status(500).json({ error: '서버 오류', message: err.message, stack: err.stack });
     }
 })
 
