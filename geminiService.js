@@ -33,10 +33,10 @@ function calculatePersonScore({
   const messagePenalty = totalMessages < 5 ? -0.1 * (5 - totalMessages) : 0;
 
   let score =
-    0.8 * adjustedEmotion +
-    0.2 * normalizedLike +
-    0.2 * normalizedQuestion +
-    0.1 * normalizedDelay +
+    0.3 * adjustedEmotion +
+    0.7 * normalizedLike +
+    0.3 * normalizedQuestion +
+    0.2 * normalizedDelay +
     neutralPenalty +
     messagePenalty;
 
@@ -62,7 +62,7 @@ export async function analyzeConversation(conversationText, otherName) {
   ${conversationText}
 
   아래와 같은 JSON 형식으로만 출력하세요. 반드시 JSON 외에는 아무 설명도 넣지 마세요. 값이 없으면 0으로 표시하세요. 모든 수치는 0.0 ~ 1.0 사이의 실수로, 총 메시지 수는 정수로 표현하세요.
-
+   
   {
     "나": {
       "emotionPositiveRatio": (긍정 감정 비율),
