@@ -7,6 +7,7 @@ import cors from 'cors';
 import imageRoutes from './routes/imageRoutes.js';
 import conversationRouter from './routes/conversation.js';
 import geminiNextReplyRoutes from './routes/geminiNextReply.js';
+import authRouter from './routes/auth.js';
 
 connectDB();
 
@@ -17,6 +18,7 @@ connectDB();
 
 app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
+app.use('/api/auth', authRouter);
 app.use('/api/image', imageRoutes); // '/api/image/upload' 경로가 되게 설정
 
 app.use('/api/categoryDetails', categoryDetailRouter)
